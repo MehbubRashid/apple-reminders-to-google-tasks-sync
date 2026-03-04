@@ -50,23 +50,32 @@ A Node.js utility to automatically synchronize your Apple Reminders to Google Ta
    ```
    Follow the URL in the terminal, authenticate, and paste the code back into the prompt.
 
-## Automation (Cron Job)
+## Automation (macOS Launchd)
 
-To keep your tasks synced automatically in the background, you can set up a cron job.
+To keep your tasks synced automatically in the background, you should use macOS `launchd` (LaunchAgents). This is more reliable than `cron` for accessing user-level databases like Reminders.
 
-1. Run the setup script to create a wrapper:
+1. **Run the setup script:**
    ```bash
-   chmod +x setup-cron.sh
-   ./setup-cron.sh
+   chmod +x setup-launchd.sh
+   ./setup-launchd.sh
    ```
-2. Copy the resulting cron line and add it to your crontab:
+   This script creates and loads a LaunchAgent (`com.user.remindersync.plist`) that triggers the sync every 15 minutes.
+
+2. **Check Status:**
    ```bash
-   crontab -e
+   launchctl list | grep remindersync
    ```
-   Example line (runs every 15 mins):
-   ```bash
-   */15 * * * * "/Users/rabu/Projects/sync reminders/run_sync.sh"
-   ```
+
+## Troubleshooting: Reminders Access
+
+If you see "Found undefined reminders" or "Access denied" in `sync.log`:
+
+1.  **Manual Verification:** Run `node index.js` manually in your terminal. macOS should prompt you to allow the terminal to access Reminders.
+2.  **Full Disk Access / Calendars:** Ensure your Terminal (or the background process) has permission. Check **System Settings > Privacy & Security > Reminders**.
+3.  **Reset Permissions:** If prompts don't appear, you can reset permissions for reminders:
+    ```bash
+    tccutil reset Reminders
+    ```
 
 ## License
 MIT

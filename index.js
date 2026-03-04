@@ -27,10 +27,17 @@ function fetchAppleReminders() {
   try {
       console.log("Fetching Apple Reminders...");
       const output = execSync(`"${SWIFT_BIN}"`, { encoding: 'utf-8' });
-      return JSON.parse(output);
+      const parsed = JSON.parse(output);
+      
+      if (parsed && parsed.error) {
+          console.error("Apple Reminders Access Error:", parsed.error);
+          return null;
+      }
+      
+      return Array.isArray(parsed) ? parsed : [];
   } catch (e) {
       console.error("Failed to fetch Apple Reminders:", e.message);
-      return [];
+      return null;
   }
 }
 
@@ -43,6 +50,10 @@ async function sync() {
     const listIdMap = {};
     
     const reminders = fetchAppleReminders();
+    if (!reminders) {
+        console.error("Aborting sync: Could not fetch reminders (likely permission denied).");
+        return;
+    }
     console.log(`Found ${reminders.length} reminders.`);
 
     for (const reminder of reminders) {
