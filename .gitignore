@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sensitive credentials
+credentials.json
+token.json
+
+# Local state and logs
+sync_state.json
+sync.log
+output.log
+
+# Compiled binaries
+fetch_reminders
+
+# System files
+.DS_Store
