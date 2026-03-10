@@ -19,6 +19,20 @@ async function loadSyncState() {
   }
 }
 
+function getTimestamp() {
+  const now = new Date();
+  const options = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  };
+  return `[${now.toLocaleString('en-ZA', options).replace(',', '')}]`;
+}
+
 async function saveSyncState() {
   await fs.writeFile(SYNC_STATE_FILE, JSON.stringify(syncState, null, 2));
 }
@@ -42,7 +56,7 @@ function fetchAppleReminders() {
 }
 
 async function sync() {
-    console.log("--- Starting Sync ---");
+    console.log(`${getTimestamp()} --- Starting Sync ---`);
     await loadSyncState();
     
     const auth = await authorize();
@@ -50,11 +64,11 @@ async function sync() {
     const listIdMap = {};
     
     const reminders = fetchAppleReminders();
-    if (!reminders) {
-        console.error("Aborting sync: Could not fetch reminders (likely permission denied).");
+    if (!reminders || !Array.isArray(reminders)) {
+        console.error(`${getTimestamp()} Aborting sync: Could not fetch reminders (likely permission denied or empty result).`);
         return;
     }
-    console.log(`Found ${reminders.length} reminders.`);
+    console.log(`${getTimestamp()} Found ${reminders.length} reminders.`);
 
     for (const reminder of reminders) {
         const rId = reminder.id;
@@ -136,7 +150,7 @@ async function sync() {
     }
     
     await saveSyncState();
-    console.log("--- Sync Complete ---");
+    console.log(`${getTimestamp()} --- Sync Complete ---`);
 }
 
 sync().catch(console.error);
