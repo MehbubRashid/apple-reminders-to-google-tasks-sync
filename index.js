@@ -40,7 +40,7 @@ async function saveSyncState() {
 function fetchAppleReminders() {
   try {
       console.log("Fetching Apple Reminders...");
-      const output = execSync(`"${SWIFT_BIN}"`, { encoding: 'utf-8' });
+      const output = execSync(`"${SWIFT_BIN}"`, { encoding: 'utf-8', timeout: 30000 });
       const parsed = JSON.parse(output);
       
       if (parsed && parsed.error) {
