@@ -153,4 +153,11 @@ async function sync() {
     console.log(`${getTimestamp()} --- Sync Complete ---`);
 }
 
-sync().catch(console.error);
+sync().catch(err => {
+    if (err.message === 'invalid_grant' || (err.response && err.response.data && err.response.data.error === 'invalid_grant')) {
+        console.error(`${getTimestamp()} [AUTHORIZATION ERROR] Google OAuth token expired or revoked.`);
+        console.error(`${getTimestamp()} Please run 'node index.js' manually in your terminal to re-authenticate.`);
+    } else {
+        console.error(`${getTimestamp()} [ERROR]`, err);
+    }
+});
